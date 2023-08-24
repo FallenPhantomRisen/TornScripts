@@ -45,24 +45,28 @@
     }
 
     function addStartButton() {
-        let startBtn = document.createElement("button");
-        startBtn.innerText = "Start Script";
-        startBtn.style.position = "fixed";
-        startBtn.style.top = "10%";
-        startBtn.style.right = "20%";
-        startBtn.style.zIndex = 9999;
-        startBtn.style.background = "#333";
-        startBtn.style.color = "#fff";
-        startBtn.style.padding = "10px";
-        startBtn.style.border = "none";
-        startBtn.style.cursor = "pointer";
-        startBtn.onclick = function() {
+    let startBtn = document.createElement("button");
+    startBtn.innerText = "Start Script";
+    startBtn.style.position = "fixed";
+    startBtn.style.top = "10%";
+    startBtn.style.right = "20%";
+    startBtn.style.zIndex = 9999;
+    startBtn.style.background = "#333";
+    startBtn.style.color = "#fff";
+    startBtn.style.padding = "10px";
+    startBtn.style.border = "none";
+    startBtn.style.cursor = "pointer";
+    startBtn.onclick = function() {
+        location.reload(true);
+        setTimeout(() => {
             initiateScript();
             createAndDisplayBox();
             startBtn.style.display = 'none';
-        };
-        document.body.appendChild(startBtn);
-    }
+        }, 500);
+    };
+    document.body.appendChild(startBtn);
+}
+
 
     function hideNonRadiationUsers() {
         let allUsers = document.querySelectorAll(".user-info-list-wrap li");
