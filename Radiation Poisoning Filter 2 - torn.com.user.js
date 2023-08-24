@@ -101,7 +101,7 @@
                 window.location.href = `https://www.torn.com/hospitalview.php#start=${nextPageValue * 50}`;
                 currentPageCount++;
                 navigationInProgress = false;
-            }, 2000);
+            }, 1000);
         } else {
             scriptActive = false;
         }
