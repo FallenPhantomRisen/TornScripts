@@ -2,7 +2,7 @@
 // @name        Custom Hospital Auto-Filter 5 - torn.com
 // @namespace   Phantom Scripts
 // @match       https://www.torn.com/hospitalview.php*
-// @version     2.0
+// @version     2.1
 // @author      ErrorNullTag
 // @description Search hospital for specific reasons.
 // ==/UserScript==
@@ -24,7 +24,7 @@
     let offsetX, offsetY;
 
     function onMouseDown(event) {
-        if (event.target.closest('#userListBox') || event.target.closest('button')) {
+        if (event.target === document.getElementById('boxTitle')) {
             isDragging = true;
             offsetX = event.clientX;
             offsetY = event.clientY;
@@ -37,7 +37,7 @@
         const dx = event.clientX - offsetX;
         const dy = event.clientY - offsetY;
 
-        const box = document.getElementById("userListBox").parentElement;
+        const box = document.getElementById("userListBoxContainer");
         const boxStyles = getComputedStyle(box);
 
         const top = parseInt(boxStyles.top) + dy;
@@ -68,19 +68,21 @@
 
     function createAndDisplayBox() {
         let container = document.createElement("div");
+        container.id = "userListBoxContainer";
         container.style.position = "fixed";
         container.style.top = "10%";
         container.style.right = "10%";
         container.style.zIndex = 9999;
-        container.style.cursor = "move";
         document.body.appendChild(container);
 
         let boxTitle = document.createElement("h3");
         boxTitle.textContent = "Phantom Scripts";
+        boxTitle.id = "boxTitle";
         boxTitle.style.margin = "0";
         boxTitle.style.padding = "10px";
         boxTitle.style.background = "#333";
         boxTitle.style.color = "#fff";
+        boxTitle.style.cursor = "move";
         container.appendChild(boxTitle);
 
         let box = document.createElement("div");
@@ -120,7 +122,11 @@
             } else {
                 for (let userName of recordedUsers[reason]) {
                     let p = document.createElement("p");
-                    p.innerText = userName;
+                    let link = document.createElement("a");
+                    link.href = `https://www.torn.com/profiles.php?XID=${userName}`;
+                    link.target = "_blank";
+                    link.textContent = userName;
+                    p.appendChild(link);
                     p.style.margin = "5px 0";
                     box.appendChild(p);
                 }
