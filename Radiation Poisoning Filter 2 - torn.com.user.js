@@ -2,7 +2,7 @@
 // @name        Custom Hospital Auto-Filter 5 - torn.com
 // @namespace   Phantom Scripts
 // @match       https://www.torn.com/hospitalview.php*
-// @version     2.1
+// @version     2.2
 // @author      ErrorNullTag
 // @description Search hospital for specific reasons.
 // ==/UserScript==
