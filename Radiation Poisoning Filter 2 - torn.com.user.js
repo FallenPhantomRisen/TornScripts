@@ -31,56 +31,70 @@
     }
 
     function createAndDisplayBox() {
-        let box = document.createElement("div");
-        box.id = "userListBox";
-        box.style.position = "fixed";
-        box.style.top = "10%";
-        box.style.right = "10%";
-        box.style.width = "200px";
-        box.style.height = "400px";
-        box.style.overflowY = "scroll";
-        box.style.background = "#fff";
-        box.style.border = "1px solid #000";
-        box.style.zIndex = 9999;
-        box.style.padding = "10px";
-        document.body.appendChild(box);
+    let box = document.createElement("div");
+    box.id = "userListBox";
+    box.style.position = "fixed";
+    box.style.top = "10%";
+    box.style.right = "10%";
+    box.style.width = "250px";
+    box.style.height = "400px";
+    box.style.overflowY = "scroll";
+    box.style.background = "#fafafa"; // Light grayish background
+    box.style.border = "1px solid #ccc"; // Light gray border
+    box.style.zIndex = 9999;
+    box.style.padding = "10px";
+    box.style.borderRadius = "5px"; // Rounded corners
+    box.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)"; // Slight shadow for depth
+    document.body.appendChild(box);
 
-        let clearButton = document.createElement("button");
-        clearButton.innerText = "Clear List";
-        clearButton.onclick = clearUsersList;
-        clearButton.style.width = "100%";
-        clearButton.style.marginBottom = "10px";
-        document.body.insertBefore(clearButton, box);
+    let clearButton = document.createElement("button");
+    clearButton.innerText = "Clear List";
+    clearButton.onclick = clearUsersList;
+    clearButton.style.width = "100%";
+    clearButton.style.marginBottom = "10px";
+    clearButton.style.background = "#007BFF"; // Blue color
+    clearButton.style.color = "#fff"; // White text
+    clearButton.style.border = "none";
+    clearButton.style.borderRadius = "3px"; // Rounded corners
+    clearButton.style.padding = "5px 10px"; // Some padding
+    clearButton.style.cursor = "pointer"; // Hand cursor on hover
+    clearButton.onmouseover = function() { this.style.background = "#0056b3"; } // Darken button on hover
+    clearButton.onmouseout = function() { this.style.background = "#007BFF"; } // Return to original color after hover
+    document.body.insertBefore(clearButton, box);
+}
 
-        populateBox();
-    }
+function populateBox() {
+    let box = document.getElementById("userListBox");
+    box.innerHTML = '';
+    for (let reason in recordedUsers) {
+        let heading = document.createElement("h4");
+        heading.innerText = reason;
+        heading.style.marginTop = "10px";
+        heading.style.color = "#333"; // Dark gray color
+        box.appendChild(heading);
 
-  function populateBox() {
-        let box = document.getElementById("userListBox");
-        box.innerHTML = '';
-        for (let reason in recordedUsers) {
-            let heading = document.createElement("h4");
-            heading.innerText = reason;
-            heading.style.marginTop = "10px";
-            box.appendChild(heading);
-
-            if (!recordedUsers[reason].size) {
-                let emptyMessage = document.createElement("p");
-                emptyMessage.innerText = "No users found";
-                box.appendChild(emptyMessage);
-            } else {
-                recordedUsers[reason].forEach(userObj => {
-                    let a = document.createElement("a");
-                    a.innerText = userObj.name;
-                    a.href = `https://www.torn.com/profiles.php?XID=${userObj.id}`;
-                    a.target = "_blank";
-                    a.style.display = "block";
-                    a.style.margin = "5px 0";
-                    box.appendChild(a);
-                });
-            }
+        if (!recordedUsers[reason].size) {
+            let emptyMessage = document.createElement("p");
+            emptyMessage.innerText = "No users found";
+            emptyMessage.style.color = "#666"; // Medium gray color
+            box.appendChild(emptyMessage);
+        } else {
+            recordedUsers[reason].forEach(userObj => {
+                let a = document.createElement("a");
+                a.innerText = userObj.name;
+                a.href = `https://www.torn.com/profiles.php?XID=${userObj.id}`;
+                a.target = "_blank";
+                a.style.display = "block";
+                a.style.margin = "5px 0";
+                a.style.color = "#007BFF"; // Blue color
+                a.style.textDecoration = "none"; // No underline
+                a.onmouseover = function() { this.style.textDecoration = "underline"; } // Underline on hover
+                a.onmouseout = function() { this.style.textDecoration = "none"; } // Remove underline after hover
+                box.appendChild(a);
+            });
         }
     }
+}
 
     function logAndStore(user, reason) {
         let userNameElem = user.querySelector(".user.name");
