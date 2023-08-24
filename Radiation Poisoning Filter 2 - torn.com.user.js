@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name        Custom Hospital Auto-Filter 5 - torn.com
+// @name        Radiation Poisoning Filtering 5 - torn.com
 // @namespace   Phantom Scripts
 // @match       https://www.torn.com/hospitalview.php*
-// @version     1.7
+// @version     1.9
 // @author      ErrorNullTag
 // @description Search hospital for specific reasons.
+// @license     GNU GPLv3
 // ==/UserScript==
 
 (function() {
