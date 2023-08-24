@@ -10,7 +10,7 @@
 (function() {
     'use strict';
 
-    let scriptActive = true;
+    let scriptActive = false;  // Initiate as false since the script should start on button click
     let navigationInProgress = false;
     let recordedUsers = {
         'Radiation poisoning': new Set(),
@@ -20,57 +20,90 @@
     const startParam = urlParams.get('start');
     let currentPageCount = startParam ? Math.floor(Number(startParam) / 50) : 0;
 
-    let isDragging = false;
-    let isBoxExpanded = true;
-    let offsetX, offsetY;
+    function initiateScript() {
+        scriptActive = true;
 
-    function onMouseDown(event) {
-        if (event.target === document.getElementById('boxTitle')) {
-            isDragging = true;
-            offsetX = event.clientX;
-            offsetY = event.clientY;
+        // Start monitoring page mutations and initiate script logic
+        const targetNode = document.querySelector('.user-info-list-wrap');
+        const config = { childList: true, subtree: true };
+
+        const callback = function(mutationList, observer) {
+            if (!scriptActive) return;
+
+            for (const mutation of mutationList) {
+                if (mutation.type === 'childList') {
+                    hideNonRadiationUsers();
+                    navigateToNextPage();
+                }
+            }
+        };
+
+        if (targetNode) {
+            const observer = new MutationObserver(callback);
+            observer.observe(targetNode, config);
         }
     }
 
-    function onMouseMove(event) {
-        if (!isDragging) return;
-
-        const dx = event.clientX - offsetX;
-        const dy = event.clientY - offsetY;
-
-        const box = document.getElementById("userListBoxContainer");
-        const boxStyles = getComputedStyle(box);
-
-        const top = parseInt(boxStyles.top) + dy;
-        const right = parseInt(boxStyles.right) - dx;
-
-        box.style.top = `${top}px`;
-        box.style.right = `${right}px`;
-
-        offsetX = event.clientX;
-        offsetY = event.clientY;
-    }
-
-    function onMouseUp(event) {
-        isDragging = false;
-    }
-
-    function clearUsersList() {
-        recordedUsers = {
-            'Radiation poisoning': new Set(),
-            'Exploded': new Set()
+    function addStartButton() {
+        let startBtn = document.createElement("button");
+        startBtn.innerText = "Start Script";
+        startBtn.style.position = "fixed";
+        startBtn.style.top = "10%";
+        startBtn.style.right = "20%";
+        startBtn.style.zIndex = 9999;
+        startBtn.style.background = "#333";
+        startBtn.style.color = "#fff";
+        startBtn.style.padding = "10px";
+        startBtn.style.border = "none";
+        startBtn.style.cursor = "pointer";
+        startBtn.onclick = function() {
+            initiateScript();
+            createAndDisplayBox();
+            startBtn.style.display = 'none';
         };
-        populateBox();
+        document.body.appendChild(startBtn);
     }
 
-    function toggleBox() {
-        const box = document.getElementById("userListBox");
-        if (isBoxExpanded) {
-            box.style.display = "none";
-            isBoxExpanded = false;
+    function hideNonRadiationUsers() {
+        let allUsers = document.querySelectorAll(".user-info-list-wrap li");
+        for (let user of allUsers) {
+            let reasonSpan = user.querySelector(".reason");
+            if (reasonSpan) {
+                if (reasonSpan.textContent.includes("Radiation poisoning")) {
+                    logAndStore(user, "Radiation poisoning");
+                } else if (reasonSpan.textContent.includes("Exploded")) {
+                    logAndStore(user, "Exploded");
+                } else {
+                    user.style.display = 'none';
+                }
+            } else {
+                user.style.display = 'none';
+            }
+        }
+    }
+
+    function logAndStore(user, reason) {
+        let userNameElem = user.querySelector(".user.name");
+        if (userNameElem) {
+            let userName = userNameElem.textContent.trim();
+            recordedUsers[reason].add(userName);
+            populateBox();
+        }
+    }
+
+    function navigateToNextPage() {
+        if (!scriptActive || navigationInProgress) return;
+
+        navigationInProgress = true;
+        const nextPageValue = currentPageCount + 1;
+        if (nextPageValue <= 65) {
+            setTimeout(function() {
+                window.location.href = `https://www.torn.com/hospitalview.php#start=${nextPageValue * 50}`;
+                currentPageCount++;
+                navigationInProgress = false;
+            }, 2000);
         } else {
-            box.style.display = "block";
-            isBoxExpanded = true;
+            scriptActive = false;
         }
     }
 
@@ -90,18 +123,7 @@
         boxTitle.style.padding = "10px";
         boxTitle.style.background = "#333";
         boxTitle.style.color = "#fff";
-        boxTitle.style.cursor = "move";
         container.appendChild(boxTitle);
-
-        let toggleButton = document.createElement("button");
-        toggleButton.innerText = "⬇";
-        toggleButton.style.position = "absolute";
-        toggleButton.style.right = "5px";
-        toggleButton.style.top = "5px";
-        toggleButton.style.background = "red";
-        toggleButton.style.color = "white";
-        toggleButton.onclick = toggleBox;
-        boxTitle.appendChild(toggleButton);
 
         let box = document.createElement("div");
         box.id = "userListBox";
@@ -116,7 +138,13 @@
 
         let clearButton = document.createElement("button");
         clearButton.innerText = "Clear List";
-        clearButton.onclick = clearUsersList;
+        clearButton.onclick = function() {
+            recordedUsers = {
+                'Radiation poisoning': new Set(),
+                'Exploded': new Set()
+            };
+            populateBox();
+        };
         clearButton.style.width = "100%";
         clearButton.style.marginTop = "10px";
         container.appendChild(clearButton);
@@ -146,74 +174,7 @@
         }
     }
 
-    function logAndStore(user, reason) {
-        let userNameElem = user.querySelector(".user.name span");
-        if (userNameElem) {
-            let userName = userNameElem.textContent.trim();
-            recordedUsers[reason].add(userName);
-            populateBox();
-        }
-    }
-
-    function hideNonRadiationUsers() {
-        let allUsers = document.querySelectorAll(".user-info-list-wrap li");
-        for (let user of allUsers) {
-            let reasonSpan = user.querySelector(".reason");
-            if (reasonSpan) {
-                if (reasonSpan.textContent.includes("Radiation poisoning")) {
-                    logAndStore(user, "Radiation poisoning");
-                } else if (reasonSpan.textContent.includes("Exploded")) {
-                    logAndStore(user, "Exploded");
-                } else {
-                    user.style.display = 'none';
-                }
-            } else {
-                user.style.display = 'none';
-            }
-        }
-    }
-
-    function navigateToNextPage() {
-        if (!scriptActive || navigationInProgress) return;
-
-        navigationInProgress = true;
-        const nextPageValue = currentPageCount + 1;
-        if (nextPageValue <= 65) {
-            setTimeout(function() {
-                window.location.href = `https://www.torn.com/hospitalview.php#start=${nextPageValue * 50}`;
-                currentPageCount++;
-                navigationInProgress = false;
-            }, 2000);
-        } else {
-            scriptActive = false;
-        }
-    }
-
-    const targetNode = document.querySelector('.user-info-list-wrap');
-    const config = { childList: true, subtree: true };
-
-    const callback = function(mutationList, observer) {
-        if (!scriptActive) return;
-
-        for (const mutation of mutationList) {
-            if (mutation.type === 'childList') {
-                hideNonRadiationUsers();
-                navigateToNextPage();
-            }
-        }
-    };
-
-    if (targetNode) {
-        const observer = new MutationObserver(callback);
-        observer.observe(targetNode, config);
-    }
-
-    // Attach the mouse event listeners
-    document.addEventListener('mousedown', onMouseDown);
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-
-    // Immediately create and populate the box upon script execution
-    createAndDisplayBox();
+    // Add the "Start" button upon script execution
+    addStartButton();
 
 })();
