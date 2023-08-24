@@ -21,6 +21,7 @@
     let currentPageCount = startParam ? Math.floor(Number(startParam) / 50) : 0;
 
     let isDragging = false;
+    let isBoxExpanded = true;
     let offsetX, offsetY;
 
     function onMouseDown(event) {
@@ -54,16 +55,23 @@
         isDragging = false;
     }
 
-    document.addEventListener('mousedown', onMouseDown);
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-
     function clearUsersList() {
         recordedUsers = {
             'Radiation poisoning': new Set(),
             'Exploded': new Set()
         };
         populateBox();
+    }
+
+    function toggleBox() {
+        const box = document.getElementById("userListBox");
+        if (isBoxExpanded) {
+            box.style.display = "none";
+            isBoxExpanded = false;
+        } else {
+            box.style.display = "block";
+            isBoxExpanded = true;
+        }
     }
 
     function createAndDisplayBox() {
@@ -85,6 +93,16 @@
         boxTitle.style.cursor = "move";
         container.appendChild(boxTitle);
 
+        let toggleButton = document.createElement("button");
+        toggleButton.innerText = "⬇";
+        toggleButton.style.position = "absolute";
+        toggleButton.style.right = "5px";
+        toggleButton.style.top = "5px";
+        toggleButton.style.background = "red";
+        toggleButton.style.color = "white";
+        toggleButton.onclick = toggleBox;
+        boxTitle.appendChild(toggleButton);
+
         let box = document.createElement("div");
         box.id = "userListBox";
         box.style.width = "200px";
@@ -102,8 +120,6 @@
         clearButton.style.width = "100%";
         clearButton.style.marginTop = "10px";
         container.appendChild(clearButton);
-
-        populateBox();
     }
 
     function populateBox() {
@@ -122,11 +138,7 @@
             } else {
                 for (let userName of recordedUsers[reason]) {
                     let p = document.createElement("p");
-                    let link = document.createElement("a");
-                    link.href = `https://www.torn.com/profiles.php?XID=${userName}`;
-                    link.target = "_blank";
-                    link.textContent = userName;
-                    p.appendChild(link);
+                    p.textContent = userName;
                     p.style.margin = "5px 0";
                     box.appendChild(p);
                 }
@@ -135,7 +147,7 @@
     }
 
     function logAndStore(user, reason) {
-        let userNameElem = user.querySelector(".user.name");
+        let userNameElem = user.querySelector(".user.name span");
         if (userNameElem) {
             let userName = userNameElem.textContent.trim();
             recordedUsers[reason].add(userName);
@@ -196,6 +208,12 @@
         observer.observe(targetNode, config);
     }
 
+    // Attach the mouse event listeners
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
+    // Immediately create and populate the box upon script execution
     createAndDisplayBox();
 
 })();
