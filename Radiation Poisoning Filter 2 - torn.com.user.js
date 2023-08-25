@@ -1,184 +1,158 @@
 // ==UserScript==
-// @name        Custom Hospital Auto-Filter 5 - torn.com
+// @name        Search Hospital For Reason - torn.com
 // @namespace   Phantom Scripts
 // @match       https://www.torn.com/hospitalview.php*
-// @version     2.2
+// @version     4.0
 // @author      ErrorNullTag
 // @description Search hospital for specific reasons.
+// @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    let scriptActive = false;  // Initiate as false since the script should start on button click
+    let scriptActive = true;
     let navigationInProgress = false;
-    let recordedUsers = {
-        'Radiation poisoning': new Set(),
-        'Exploded': new Set()
-    };
-    const urlParams = new URLSearchParams(window.location.search);
-    const startParam = urlParams.get('start');
-    let currentPageCount = startParam ? Math.floor(Number(startParam) / 50) : 0;
+    let recordedUsers = [];
 
-    function initiateScript() {
-        scriptActive = true;
+    const targetNode = document.querySelector('.user-info-list-wrap');
+    const config = { childList: true, subtree: true };
 
-        // Start monitoring page mutations and initiate script logic
-        const targetNode = document.querySelector('.user-info-list-wrap');
-        const config = { childList: true, subtree: true };
+    const callback = function(mutationList, observer) {
+        if (!scriptActive) return;
 
-        const callback = function(mutationList, observer) {
-            if (!scriptActive) return;
-
-            for (const mutation of mutationList) {
-                if (mutation.type === 'childList') {
-                    hideNonRadiationUsers();
-                    navigateToNextPage();
-                }
+        for (const mutation of mutationList) {
+            if (mutation.type === 'childList') {
+                hideNonTargetedUsers();
+                navigateToNextPage();
             }
-        };
-
-        if (targetNode) {
-            const observer = new MutationObserver(callback);
-            observer.observe(targetNode, config);
         }
-    }
-
-    function addStartButton() {
-    let startBtn = document.createElement("button");
-    startBtn.innerText = "Start Script";
-    startBtn.style.position = "fixed";
-    startBtn.style.top = "10%";
-    startBtn.style.right = "20%";
-    startBtn.style.zIndex = 9999;
-    startBtn.style.background = "#333";
-    startBtn.style.color = "#fff";
-    startBtn.style.padding = "10px";
-    startBtn.style.border = "none";
-    startBtn.style.cursor = "pointer";
-    startBtn.onclick = function() {
-        location.reload(true);
-        setTimeout(() => {
-            initiateScript();
-            createAndDisplayBox();
-            startBtn.style.display = 'none';
-        }, 500);
     };
-    document.body.appendChild(startBtn);
-}
 
+    const observer = new MutationObserver(callback);
+    observer.observe(targetNode, config);
 
-    function hideNonRadiationUsers() {
+    function hideNonTargetedUsers() {
         let allUsers = document.querySelectorAll(".user-info-list-wrap li");
         for (let user of allUsers) {
             let reasonSpan = user.querySelector(".reason");
             if (reasonSpan) {
-                if (reasonSpan.textContent.includes("Radiation poisoning")) {
-                    logAndStore(user, "Radiation poisoning");
-                } else if (reasonSpan.textContent.includes("Exploded")) {
-                    logAndStore(user, "Exploded");
-                } else {
-                    user.style.display = 'none';
+                let reasonText = reasonSpan.textContent;
+                let userID = user.querySelector(".user.name").getAttribute("data-player");
+                let userName = user.querySelector(".user.name").textContent.trim();
+                let existingIndex = recordedUsers.findIndex(u => u.name === userName);
+                if (existingIndex !== -1) {
+                    recordedUsers.splice(existingIndex, 1); // Remove previous record
                 }
+                recordedUsers.push({id: userID, name: userName, reason: reasonText});
+                user.style.display = 'none';
             } else {
                 user.style.display = 'none';
             }
         }
     }
 
-    function logAndStore(user, reason) {
-        let userNameElem = user.querySelector(".user.name");
-        if (userNameElem) {
-            let userName = userNameElem.textContent.trim();
-            recordedUsers[reason].add(userName);
-            populateBox();
-        }
-    }
-
     function navigateToNextPage() {
-        if (!scriptActive || navigationInProgress) return;
+        if (navigationInProgress) return;
 
         navigationInProgress = true;
-        const nextPageValue = currentPageCount + 1;
-        if (nextPageValue <= 65) {
+        const nextPageValue = Number(window.location.hash.replace('#start=', '')) + 50;
+        if (nextPageValue <= 3000) {
             setTimeout(function() {
-                window.location.href = `https://www.torn.com/hospitalview.php#start=${nextPageValue * 50}`;
-                currentPageCount++;
+                window.location.href = `https://www.torn.com/hospitalview.php#start=${nextPageValue}`;
                 navigationInProgress = false;
-            }, 1000);
+            }, 850);
         } else {
             scriptActive = false;
+            createMenu();
         }
     }
 
-    function createAndDisplayBox() {
-        let container = document.createElement("div");
-        container.id = "userListBoxContainer";
-        container.style.position = "fixed";
-        container.style.top = "10%";
-        container.style.right = "10%";
-        container.style.zIndex = 9999;
-        document.body.appendChild(container);
+    function createMenu() {
+        // Check if menu box already exists and remove it
+        let existingMenu = document.getElementById("hospitalUsersMenu");
+        if (existingMenu) existingMenu.remove();
 
-        let boxTitle = document.createElement("h3");
-        boxTitle.textContent = "Phantom Scripts";
-        boxTitle.id = "boxTitle";
-        boxTitle.style.margin = "0";
-        boxTitle.style.padding = "10px";
-        boxTitle.style.background = "#333";
-        boxTitle.style.color = "#fff";
-        container.appendChild(boxTitle);
+        let menuBox = document.createElement("div");
+        menuBox.id = "hospitalUsersMenu";
+        menuBox.style.position = "fixed";
+        menuBox.style.top = "10px";
+        menuBox.style.right = "10px";
+        menuBox.style.zIndex = 9999;
+        menuBox.style.border = "1px solid #ddd";
+        menuBox.style.background = "#fff";
+        menuBox.style.padding = "10px";
+        menuBox.style.width = "350px";
+        menuBox.style.height = "500px";
+        menuBox.style.overflowY = "auto";
+        menuBox.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
+        document.body.appendChild(menuBox);
 
-        let box = document.createElement("div");
-        box.id = "userListBox";
-        box.style.width = "200px";
-        box.style.height = "400px";
-        box.style.overflowY = "scroll";
-        box.style.background = "#f7f7f7";
-        box.style.border = "1px solid #000";
-        box.style.zIndex = 9999;
-        box.style.padding = "10px";
-        container.appendChild(box);
+        let searchBox = document.createElement("input");
+        searchBox.setAttribute("type", "text");
+        searchBox.setAttribute("placeholder", "Search users by reason...");
+        searchBox.style.width = "100%";
+        searchBox.style.padding = "5px";
+        searchBox.style.marginBottom = "10px";
+        searchBox.addEventListener("input", function() {
+            filterUsersByReason(this.value.toLowerCase());
+        });
+        menuBox.appendChild(searchBox);
 
-        let clearButton = document.createElement("button");
-        clearButton.innerText = "Clear List";
-        clearButton.onclick = function() {
-            recordedUsers = {
-                'Radiation poisoning': new Set(),
-                'Exploded': new Set()
-            };
-            populateBox();
-        };
-        clearButton.style.width = "100%";
-        clearButton.style.marginTop = "10px";
-        container.appendChild(clearButton);
+        let table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.borderCollapse = "collapse";
+        menuBox.appendChild(table);
+
+        let thead = document.createElement("thead");
+        let tr = document.createElement("tr");
+        let th1 = document.createElement("th");
+        th1.textContent = "User";
+        th1.style.borderBottom = "1px solid #ddd";
+        th1.style.padding = "5px";
+        let th2 = document.createElement("th");
+        th2.textContent = "Reason";
+        th2.style.borderBottom = "1px solid #ddd";
+        th2.style.padding = "5px";
+        tr.appendChild(th1);
+        tr.appendChild(th2);
+        thead.appendChild(tr);
+        table.appendChild(thead);
+
+        let tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+
+        for (let user of recordedUsers) {
+            let tr = document.createElement("tr");
+
+            let td1 = document.createElement("td");
+            let profileLink = document.createElement("a");
+            profileLink.href = `https://www.torn.com/profiles.php?XID=${user.id}`;
+            profileLink.textContent = user.name;
+            profileLink.target = "_blank";
+            td1.appendChild(profileLink);
+            td1.style.padding = "5px";
+
+            let td2 = document.createElement("td");
+            td2.textContent = user.reason;
+            td2.style.padding = "5px";
+
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tbody.appendChild(tr);
+        }
     }
 
-    function populateBox() {
-        let box = document.getElementById("userListBox");
-        box.innerHTML = '';
-        for (let reason in recordedUsers) {
-            let heading = document.createElement("h4");
-            heading.innerText = reason;
-            heading.style.marginTop = "10px";
-            box.appendChild(heading);
-
-            if (!recordedUsers[reason].size) {
-                let emptyMessage = document.createElement("p");
-                emptyMessage.innerText = "No users found";
-                box.appendChild(emptyMessage);
+    function filterUsersByReason(query) {
+        let tbody = document.querySelector("#hospitalUsersMenu tbody");
+        let rows = tbody.querySelectorAll("tr");
+        for (let row of rows) {
+            if (row.querySelector("td:last-child").textContent.toLowerCase().includes(query)) {
+                row.style.display = "";
             } else {
-                for (let userName of recordedUsers[reason]) {
-                    let p = document.createElement("p");
-                    p.textContent = userName;
-                    p.style.margin = "5px 0";
-                    box.appendChild(p);
-                }
+                row.style.display = "none";
             }
         }
     }
-
-    // Add the "Start" button upon script execution
-    addStartButton();
 
 })();
