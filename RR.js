@@ -1,3 +1,15 @@
+// ==UserScript==
+// @name         Torn Russian Roulette
+// @namespace    http://tampermonkey.net/
+// @version      1.6
+// @description  Loader for the Torn RR Helper script
+// @author       ErrorNullTag
+// @match        https://www.torn.com/page.php?sid*
+// @grant        GM_xmlhttpRequest
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @license      GPU AGPLv3
+// ==/UserScript==
 (function() {
     'use strict';
 
