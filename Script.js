@@ -22,7 +22,7 @@
     initBox();
 
     const idList = new Map();
-    const userIdWhitelist = new Set([1605207, 2186323]); // Replace with your whitelisted user IDs
+    const userIdWhitelist = new Set([12345, 67890]); // Replace with your whitelisted user IDs
 
     function initBox() {
         const updateBoxDimensions = () => {
@@ -56,6 +56,20 @@
         window.addEventListener('resize', updateBoxDimensions);
     }
     const fetchedPlayerIds = new Set();
+
+    const extractUserId = () => {
+        const element = document.querySelector('.menu-value___gLaLR');
+        if (element) {
+            const href = element.getAttribute('href');
+            const match = href.match(/XID=(\d+)/);
+            if (match) {
+                return match[1]; // This will give you the extracted user ID
+            }
+        }
+        return null;
+    };
+
+    const currentUserId = extractUserId();
 
     const fetchPlayerData = async (playerId) => {
         const response = await fetch(`https://api.torn.com/user/${playerId}?selections=profile&key=${apiKey}`);
@@ -97,6 +111,11 @@
             return;
         }
 
+        if (currentUserId && !userIdWhitelist.has(currentUserId)) {
+            alert('You are not whitelisted.');
+            return;
+        }
+
         for (let [username, data] of idList.entries()) {
             const userDisplayname = data.username || 'N/A';
             const userMoney = data.money || 'N/A';
@@ -104,11 +123,6 @@
             let level = data.level || 'N/A';
             let status = data.status || 'N/A';
             let age = data.age || 'N/A';
-
-            if (!userIdWhitelist.has(playerId)) {
-                alert('You are not whitelisted.');
-                return;
-            }
 
             if (playerId !== 'N/A' && !fetchedPlayerIds.has(playerId)) {
                 const extraData = await fetchPlayerData(playerId);
