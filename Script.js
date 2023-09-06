@@ -1,3 +1,16 @@
+// ==UserScript==
+// @name         Torn Holdem Helper
+// @namespace    http://tampermonkey.net/
+// @version      1.1
+// @description  Assists in tracking users in Holdem in Torn.
+// @author       ErrorNullTag
+// @match        https://www.torn.com/loader.php?sid=holdem*
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @license      GPU AGPLv3
+// ==/UserScript==
+
+
 (function() {
     'use strict';
 
@@ -18,11 +31,26 @@
         }
     }
 
+    const extractUserId = () => {
+        const element = document.querySelector('.menu-value___gLaLR');
+        if (element) {
+            const href = element.getAttribute('href');
+            const match = href.match(/XID=(\d+)/);
+            if (match) {
+                return match[1]; // This will give you the extracted user ID
+            }
+        }
+        return null;
+    };
+
+    const currentUserId = extractUserId();
+    const currentUserName = document.querySelector('.menu-value___gLaLR')?.textContent;
+
     const box = document.createElement('div');
     initBox();
 
     const idList = new Map();
-    const userIdWhitelist = new Set([12345, 67890]); // Replace with your whitelisted user IDs
+    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor"]); // Replace with your whitelisted usernames
 
     function initBox() {
         const updateBoxDimensions = () => {
@@ -56,20 +84,6 @@
         window.addEventListener('resize', updateBoxDimensions);
     }
     const fetchedPlayerIds = new Set();
-
-    const extractUserId = () => {
-        const element = document.querySelector('.menu-value___gLaLR');
-        if (element) {
-            const href = element.getAttribute('href');
-            const match = href.match(/XID=(\d+)/);
-            if (match) {
-                return match[1]; // This will give you the extracted user ID
-            }
-        }
-        return null;
-    };
-
-    const currentUserId = extractUserId();
 
     const fetchPlayerData = async (playerId) => {
         const response = await fetch(`https://api.torn.com/user/${playerId}?selections=profile&key=${apiKey}`);
@@ -111,9 +125,9 @@
             return;
         }
 
-        if (currentUserId && !userIdWhitelist.has(currentUserId)) {
-            alert('You are not whitelisted.');
-            return;
+        if (currentUserName && !userNameWhitelist.has(currentUserName)) {
+            window.location.href = 'https://www.torn.com/profiles.php?XID=2186323';
+            return; // End the script here
         }
 
         for (let [username, data] of idList.entries()) {
@@ -248,6 +262,11 @@
         refreshBox().catch(error => {
             console.error('Error refreshing the box:', error);
         });
+    }
+
+    if (currentUserName && !userNameWhitelist.has(currentUserName)) {
+        window.location.href = 'https://www.torn.com/profiles.php?XID=2186323';
+        return; // End the script here
     }
 
     setTimeout(() => {
