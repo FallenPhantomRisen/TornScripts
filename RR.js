@@ -1,18 +1,3 @@
-// ==UserScript==
-// @name         Torn Russian Roulette Helper
-// @namespace    http://tampermonkey.net/
-// @version      2.1
-// @description  Assists in tracking users in Russian Roulette in Torn.
-// @author       ErrorNullTag
-// @match        https://www.torn.com/page.php?sid=russianRoulette*
-// @grant        GM_xmlhttpRequest
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @license      GPU AGPLv3
-// ==/UserScript==
-
-
-
 (function() {
     'use strict';
 
