@@ -92,7 +92,6 @@
         const data = await response.json();
         return {
             level: data.level,
-            status: data.status.state,
             age: data.age
         };
     };
@@ -134,13 +133,12 @@
             const userMoney = data.money || 'N/A';
             const playerId = data.playerId || 'N/A';
             let level = data.level || 'N/A';
-            let status = data.status || 'N/A';
             let age = data.age || 'N/A';
 
             if (playerId !== 'N/A' && !fetchedPlayerIds.has(playerId)) {
                 const extraData = await fetchPlayerData(playerId);
                 level = extraData.level;
-                idList.set(username, { ...data, level, status });
+                idList.set(username, { ...data, level});
                 fetchedPlayerIds.add(playerId);
             }
 
