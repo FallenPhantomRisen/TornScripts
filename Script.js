@@ -10,7 +10,6 @@
 // @license      GPU AGPLv3
 // ==/UserScript==
 
-
 (function() {
     'use strict';
 
@@ -117,7 +116,7 @@
         }
 
         entry.appendChild(userContainer);
-        entry.innerHTML += `<br><strong>ID:</strong> ${data.playerId}<br><strong>Money:</strong> ${data.money}<br><strong>Level:</strong> ${data.level}<br><strong>Status:</strong> ${data.status}<br>`;
+        entry.innerHTML += `<br><strong>ID:</strong> ${data.playerId}<br><strong>Money:</strong> ${data.money}<br><strong>Level:</strong> ${data.level}<br>`;
     }
 
     async function refreshBox() {
@@ -165,7 +164,7 @@
                 userContainer.appendChild(mugLink);
 
                 newEntry.appendChild(userContainer);
-                newEntry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br><strong>Status:</strong> ${status}<br><strong>Age:</strong> ${age}<br>`;
+                newEntry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br>`;
                 box.appendChild(newEntry);
             } else {
                 entry.innerHTML = '';
@@ -183,7 +182,7 @@
                 userContainer.appendChild(mugLink);
 
                 entry.appendChild(userContainer);
-                entry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br><strong>Status:</strong> ${status}<br><strong>Age:</strong> ${age}<br>`;
+                entry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br><strong>Status:</strong><br>`;
             }
 
             if (data.leftTable) {
