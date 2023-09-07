@@ -49,7 +49,7 @@
     initBox();
 
     const idList = new Map();
-    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor"]); // Replace with your whitelisted usernames
+    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor", "SemiRocket", "Latinobull14"]); // Replace with your whitelisted usernames
 
     function initBox() {
         const updateBoxDimensions = () => {
