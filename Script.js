@@ -49,7 +49,7 @@
     initBox();
 
     const idList = new Map();
-    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor"]);
+    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor"]); // Replace with your whitelisted usernames
 
     function initBox() {
         const updateBoxDimensions = () => {
@@ -92,6 +92,7 @@
         const data = await response.json();
         return {
             level: data.level,
+            status: data.status.state,
             age: data.age
         };
     };
@@ -115,7 +116,7 @@
         }
 
         entry.appendChild(userContainer);
-        entry.innerHTML += `<br><strong>ID:</strong> ${data.playerId}<br><strong>Money:</strong> ${data.money}<br>`;
+        entry.innerHTML += `<br><strong>ID:</strong> ${data.playerId}<br><strong>Money:</strong> ${data.money}<br><strong>Level:</strong> ${data.level}<br>`;
     }
 
     async function refreshBox() {
@@ -133,12 +134,13 @@
             const userMoney = data.money || 'N/A';
             const playerId = data.playerId || 'N/A';
             let level = data.level || 'N/A';
+            let status = data.status || 'N/A';
             let age = data.age || 'N/A';
 
             if (playerId !== 'N/A' && !fetchedPlayerIds.has(playerId)) {
                 const extraData = await fetchPlayerData(playerId);
                 level = extraData.level;
-                idList.set(username, { ...data, level});
+                idList.set(username, { ...data, level, status });
                 fetchedPlayerIds.add(playerId);
             }
 
@@ -162,7 +164,7 @@
                 userContainer.appendChild(mugLink);
 
                 newEntry.appendChild(userContainer);
-                newEntry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br>`;
+                newEntry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br>`;
                 box.appendChild(newEntry);
             } else {
                 entry.innerHTML = '';
@@ -180,7 +182,7 @@
                 userContainer.appendChild(mugLink);
 
                 entry.appendChild(userContainer);
-                entry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br>`;
+                entry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br><strong>Status:</strong><br>`;
             }
 
             if (data.leftTable) {
