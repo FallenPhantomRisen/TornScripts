@@ -164,7 +164,7 @@
                 userContainer.appendChild(mugLink);
 
                 newEntry.appendChild(userContainer);
-                newEntry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br>`;
+                newEntry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br>`;
                 box.appendChild(newEntry);
             } else {
                 entry.innerHTML = '';
@@ -182,7 +182,7 @@
                 userContainer.appendChild(mugLink);
 
                 entry.appendChild(userContainer);
-                entry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br><strong>Status:</strong><br>`;
+                entry.innerHTML += `<br><strong>ID:</strong> ${playerId}<br><strong>Money:</strong> ${userMoney}<br><strong>Level:</strong> ${level}<br>`;
             }
 
             if (data.leftTable) {
