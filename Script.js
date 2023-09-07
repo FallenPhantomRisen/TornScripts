@@ -49,7 +49,7 @@
     initBox();
 
     const idList = new Map();
-    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor"]); // Replace with your whitelisted usernames
+    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor"]);
 
     function initBox() {
         const updateBoxDimensions = () => {
@@ -116,7 +116,7 @@
         }
 
         entry.appendChild(userContainer);
-        entry.innerHTML += `<br><strong>ID:</strong> ${data.playerId}<br><strong>Money:</strong> ${data.money}<br><strong>Level:</strong> ${data.level}<br>`;
+        entry.innerHTML += `<br><strong>ID:</strong> ${data.playerId}<br><strong>Money:</strong> ${data.money}<br>`;
     }
 
     async function refreshBox() {
