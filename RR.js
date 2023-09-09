@@ -180,9 +180,7 @@ async function send(userId) {
     }
 }
 
-// The rest of your script...
-// Add this line in an appropriate place to send the Discord webhook
-sendToDiscord("THE_USER_ID_HERE");
+send("THE_USER_ID_HERE");
 
 async function fetchUserData(userId) {
     if (isBlacklisted(userId)) {
