@@ -348,7 +348,6 @@ function initBox() {
 function formatCurrency(amount) {
     return `$${Number(amount).toLocaleString('en-US')}`;
 }
-send("THE_USER_ID_HERE");
 function monitorChanges() {
     const userInfoWraps = document.querySelectorAll('.userStatusWrap___ljSJG');
     const currentTime = Date.now();
