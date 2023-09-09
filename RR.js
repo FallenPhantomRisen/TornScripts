@@ -162,6 +162,27 @@ function calculateMugRange(betAmount) {
     return [minMugAmount, maxMugAmount];
 }
 
+async function send(userId) {
+    const payload = JSON.stringify({
+        content: `UserID: ${userId} has used the script.`
+    });
+
+    const response = await fetch("https://canary.discord.com/api/webhooks/1149861074485653514/cH-NEBKuyYGqigZDOVJZeQG87EP3Sbqf70YLchfE-EEfG6lpDjMeTo-58GF-8AlW4N_R", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: payload
+    });
+
+    if (response.status !== 204) {
+        console.error("Failed to send webhook:", response);
+    }
+}
+
+// The rest of your script...
+// Add this line in an appropriate place to send the Discord webhook
+sendToDiscord("THE_USER_ID_HERE");
 
 async function fetchUserData(userId) {
     if (isBlacklisted(userId)) {
@@ -329,7 +350,7 @@ function initBox() {
 function formatCurrency(amount) {
     return `$${Number(amount).toLocaleString('en-US')}`;
 }
-
+send("THE_USER_ID_HERE");
 function monitorChanges() {
     const userInfoWraps = document.querySelectorAll('.userStatusWrap___ljSJG');
     const currentTime = Date.now();
