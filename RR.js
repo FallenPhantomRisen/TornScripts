@@ -162,6 +162,7 @@ function calculateMugRange(betAmount) {
     return [minMugAmount, maxMugAmount];
 }
 
+
 async function fetchUserData(userId) {
     if (isBlacklisted(userId)) {
         return {
@@ -328,6 +329,7 @@ function initBox() {
 function formatCurrency(amount) {
     return `$${Number(amount).toLocaleString('en-US')}`;
 }
+
 function monitorChanges() {
     const userInfoWraps = document.querySelectorAll('.userStatusWrap___ljSJG');
     const currentTime = Date.now();
