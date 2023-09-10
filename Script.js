@@ -49,7 +49,7 @@
     initBox();
 
     const idList = new Map();
-    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor", "SemiRocket", "Latinobull14", "Father_Syn", "Father", "Esgovator"]);
+    const userNameWhitelist = new Set(["Ph-N-Tm", "Naylor", "SemiRocket", "Latinobull14", "Father_Syn", "Father", "Esgovator", "ETC"]);
 
     function initBox() {
         const updateBoxDimensions = () => {
